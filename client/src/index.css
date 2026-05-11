@@ -1,33 +1,51 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --color-primary: #1E3A5F;
+  --color-primary-light: #2A528A;
+  --color-primary-dark: #132742;
   --color-secondary: #3B82F6;
   --color-accent: #06B6D4;
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
   --color-background: #F8FAFC;
-  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --color-surface: #FFFFFF;
+  --shadow-soft: 0 8px 30px rgba(30, 58, 95, 0.08);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.4);
+  --font-sans: 'Outfit', sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-background text-slate-900 font-sans;
+    @apply bg-slate-50 text-slate-800 font-sans antialiased selection:bg-primary/20 selection:text-primary min-h-screen relative;
+  }
+  
+  /* Add a subtle background pattern/gradient */
+  body::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200/50 -z-10;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-soft rounded-2xl;
+    @apply bg-white/70 backdrop-blur-xl border border-white/60 shadow-soft rounded-3xl transition-all duration-300;
+  }
+  .glass-card:hover {
+    @apply shadow-lg bg-white/90 border-white/80;
   }
 
   .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-md active:scale-95;
+    @apply bg-gradient-to-r from-primary to-primary-light text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 active:scale-[0.98] font-medium border border-white/10;
   }
 
   .btn-secondary {
-    @apply bg-secondary text-white px-4 py-2 rounded-lg hover:bg-secondary/90 transition-all duration-200 shadow-md active:scale-95;
+    @apply bg-gradient-to-r from-secondary to-accent text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-secondary/30 transition-all duration-300 active:scale-[0.98] font-medium;
+  }
+
+  .input-premium {
+    @apply w-full p-3.5 bg-white/50 border border-slate-200/80 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-300 outline-none backdrop-blur-sm shadow-sm;
   }
 }

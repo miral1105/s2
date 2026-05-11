@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { motion } from 'framer-motion';
 import { Ship, Package, Loader2, ChevronDown, Search } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const statusColor = (status) => {
   switch (status) {
@@ -42,6 +43,7 @@ const AdminShipRequests = () => {
       setRows(flat);
     } catch (err) {
       console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to fetch requests');
     } finally {
       setLoading(false);
     }
@@ -50,13 +52,14 @@ const AdminShipRequests = () => {
   const handleStatusChange = async (packageId, newStatus) => {
     setUpdatingId(packageId);
     try {
-      await axiosInstance.put(`/ship-requests/packages/${packageId}/status`, { status: newStatus });
+      const { data } = await axiosInstance.put(`/ship-requests/packages/${packageId}/status`, { status: newStatus });
       setRows(prev => prev.map(r =>
         r.pkg._id === packageId ? { ...r, pkg: { ...r.pkg, status: newStatus } } : r
       ));
+      toast.success(data?.message || `Status updated to ${newStatus}`);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to update status');
+      toast.error(err.response?.data?.message || 'Failed to update status');
     } finally {
       setUpdatingId(null);
     }

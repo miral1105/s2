@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, User, Search, X, Loader2, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const PackageIntakeModal = ({ isOpen, onClose, onPackageAdded }) => {
   const [formData, setFormData] = useState({
@@ -87,18 +88,22 @@ const PackageIntakeModal = ({ isOpen, onClose, onPackageAdded }) => {
     setLoading(true);
     setError('');
     try {
-      await axiosInstance.post('/packages', {
+      const { data } = await axiosInstance.post('/packages', {
         ...formData,
         clientId: selectedClient._id,
         dimensions: { length: formData.length, width: formData.width, height: formData.height }
       });
       setSuccess(true);
+      if (data.message) toast.success(data.message);
+      else toast.success('Package registered successfully!');
+      
       setTimeout(() => {
         if (onPackageAdded) onPackageAdded();
         onClose();
       }, 1200);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create package');
+      toast.error(err.response?.data?.message || 'Failed to create package');
       setLoading(false);
     }
   };
@@ -108,11 +113,11 @@ const PackageIntakeModal = ({ isOpen, onClose, onPackageAdded }) => {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/30 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/30 backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
         <motion.div
           className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden"
@@ -122,21 +127,21 @@ const PackageIntakeModal = ({ isOpen, onClose, onPackageAdded }) => {
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         >
           {/* Header */}
-          <div className="p-6 flex items-center justify-between bg-primary text-white">
+          <div className="p-6 flex items-center justify-between bg-primary text-white border-b border-primary-light">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <Package size={20} />
+              <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10 shadow-inner">
+                <Package size={22} />
               </div>
               <div>
-                <h2 className="text-xl font-bold">Add New Package</h2>
-                <p className="text-sm text-white/60">Log an incoming package for a client</p>
+                <h2 className="text-xl font-bold tracking-wide">Add New Package</h2>
+                <p className="text-sm text-white/70 font-medium">Log an incoming package for a client</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-colors border border-white/5"
             >
-              <X size={18} />
+              <X size={20} />
             </button>
           </div>
 
@@ -167,39 +172,39 @@ const PackageIntakeModal = ({ isOpen, onClose, onPackageAdded }) => {
                       <Package size={14} className="text-secondary" /> Package Details
                     </h3>
 
-                    <div className="space-y-1">
-                      <label className="text-sm font-semibold text-slate-700">Tracking Number</label>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-bold text-slate-700">Tracking Number</label>
                       <input type="text" name="trackingNumber" required placeholder="Carrier tracking code"
-                        className="block w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none"
+                        className="block w-full p-3.5 border border-slate-200/60 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all outline-none shadow-sm font-medium"
                         value={formData.trackingNumber} onChange={handleChange} />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-sm font-semibold text-slate-700">Weight (lbs)</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-bold text-slate-700">Weight (lbs)</label>
                         <input type="number" name="weight" required placeholder="0.0"
-                          className="block w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none"
+                          className="block w-full p-3.5 border border-slate-200/60 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all outline-none shadow-sm font-medium"
                           value={formData.weight} onChange={handleChange} />
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-sm font-semibold text-slate-700">Contents</label>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-bold text-slate-700">Contents</label>
                         <input type="text" name="contents" required placeholder="e.g. Electronics"
-                          className="block w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none"
+                          className="block w-full p-3.5 border border-slate-200/60 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all outline-none shadow-sm font-medium"
                           value={formData.contents} onChange={handleChange} />
                       </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-sm font-semibold text-slate-700">Dimensions (L × W × H in inches)</label>
-                      <div className="flex items-center gap-2">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-bold text-slate-700">Dimensions (L × W × H in inches)</label>
+                      <div className="flex items-center gap-3">
                         <input type="number" name="length" placeholder="L" onChange={handleChange}
-                          className="flex-1 p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary outline-none" />
-                        <span className="text-slate-400 font-medium">×</span>
+                          className="flex-1 p-3.5 border border-slate-200/60 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all outline-none shadow-sm font-medium text-center" />
+                        <span className="text-slate-400 font-bold">×</span>
                         <input type="number" name="width" placeholder="W" onChange={handleChange}
-                          className="flex-1 p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary outline-none" />
-                        <span className="text-slate-400 font-medium">×</span>
+                          className="flex-1 p-3.5 border border-slate-200/60 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all outline-none shadow-sm font-medium text-center" />
+                        <span className="text-slate-400 font-bold">×</span>
                         <input type="number" name="height" placeholder="H" onChange={handleChange}
-                          className="flex-1 p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-secondary outline-none" />
+                          className="flex-1 p-3.5 border border-slate-200/60 rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all outline-none shadow-sm font-medium text-center" />
                       </div>
                     </div>
                   </div>
@@ -210,10 +215,10 @@ const PackageIntakeModal = ({ isOpen, onClose, onPackageAdded }) => {
                       <User size={14} className="text-secondary" /> Recipient Client
                     </h3>
 
-                    <div className="space-y-1 relative">
-                      <label className="text-sm font-semibold text-slate-700">Search Client</label>
+                    <div className="space-y-1.5 relative">
+                      <label className="text-sm font-bold text-slate-700">Search Client</label>
                       <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                           {searchLoading
                             ? <Loader2 size={18} className="animate-spin text-secondary" />
                             : <Search size={18} className="text-slate-400" />
@@ -222,7 +227,7 @@ const PackageIntakeModal = ({ isOpen, onClose, onPackageAdded }) => {
                         <input
                           type="text"
                           placeholder="Type name or email..."
-                          className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-secondary focus:border-secondary transition-all outline-none ${selectedClient ? 'border-success bg-success/5' : 'border-slate-200'
+                          className={`block w-full pl-12 pr-4 py-3.5 border rounded-xl bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-secondary/20 focus:border-secondary transition-all outline-none shadow-sm font-medium ${selectedClient ? 'border-success bg-success/5 text-success focus:border-success focus:ring-success/20' : 'border-slate-200/60 text-slate-700'
                             }`}
                           value={searchQuery}
                           onChange={handleClientSearch}
@@ -292,13 +297,13 @@ const PackageIntakeModal = ({ isOpen, onClose, onPackageAdded }) => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-3 pt-2">
+                <div className="flex gap-4 pt-4">
                   <button type="button" onClick={onClose}
-                    className="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition-all">
+                    className="flex-1 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all">
                     Cancel
                   </button>
                   <button type="submit" disabled={loading}
-                    className="flex-1 py-3 rounded-xl bg-secondary text-white font-bold hover:bg-secondary/90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-60">
+                    className="flex-1 py-3.5 rounded-xl bg-secondary text-white font-bold hover:bg-secondary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-60 disabled:hover:translate-y-0">
                     {loading ? <Loader2 size={20} className="animate-spin" /> : <Package size={20} />}
                     {loading ? 'Creating...' : 'Create Package'}
                   </button>
